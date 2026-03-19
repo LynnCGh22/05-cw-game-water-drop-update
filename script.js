@@ -26,6 +26,7 @@ const catcherNav = document.getElementById("catcher-nav");
 const scoreElement = document.getElementById("score");
 const timeElement = document.getElementById("time");
 const rulesSectionElement = document.getElementById("rules-section");
+const gameBackgroundSectionElement = document.getElementById("game-background-section");
 let rulesExpanded = true;
 const CONFETTI_COLORS = [
   "#FFC907",
@@ -42,7 +43,7 @@ const CONFETTI_COLORS = [
   "#FF6961",
 ];
 
-const gameBackground = ["Charity: Water's work is driven by a belief that clean water is more than a basic need, it iss the foundation for health, education, dignity, and opportunity. This game reflects that passion by turning their mission into an experience players can feel and participate in. Every clean drop collected and every challenge completed in a game symbolize the real struggles communities face and hte lope that clean water brings. Through the game, players are not just moving a character on a screen, they are stepping into a story about resilience, possibility, and the power of small actions that add up to meaningful change. The game becomes an interactive doorway into understanding why clean water matters and how collective effort can transform lives."]
+const gameBackground = ["Charity: Water's work is driven by a belief that clean water is more than a basic need, it iss the foundation for health, education, dignity, and opportunity. This game reflects that passion by turning their mission into an experience players can feel and participate in. Every clean drop collected and every challenge completed in a game symbolize the real struggles communities face and the lope that clean water brings. Through the game, players are not just moving a character on a screen, they are stepping into a story about resilience, possibility, and the power of small actions that add up to meaningful change. The game becomes an interactive doorway into understanding why clean water matters and how collective effort can transform lives."]
 
 var gameLevels = ["Easy", "Medium", "Hard", "Expert"];
 
@@ -64,6 +65,15 @@ function getRandomDropType() {
 
 function isFake() {
   return Math.random() < FAKE_DROP_CHANCE;
+}
+
+function renderGameBackground() {
+  const target = gameBackgroundSectionElement || document.getElementById("game-background-section");
+  if (!target || gameBackground.length === 0) return;
+
+  const paragraph = document.createElement("p");
+  paragraph.textContent = gameBackground[0];
+  target.replaceChildren(paragraph);
 }
 
 
@@ -118,6 +128,7 @@ catcherNav.addEventListener("input", (event) => {
 
 updateCatcherPosition(catcherNav.value);
 RulesSection();
+renderGameBackground();
 
 function showPauseOverlay() {
   document.getElementById("pause-overlay").hidden = false;
