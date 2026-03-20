@@ -5,8 +5,33 @@ let dropMaker; // Will store our timer that creates drops regularly
 let timerInterval;
 const GAME_DURATION = 30;
 let timeLeft = GAME_DURATION;
-const CLEAN_DROP_CHANCE = 0.7;
-const FAKE_DROP_CHANCE = 0.2;
+const DEFAULT_DIFFICULTY = "Easy";
+const DIFFICULTY_SETTINGS = {
+  Easy: {
+    cleanDropChance: 0.75,
+    fakeDropChance: 0,
+    fallDurationSeconds: 3.8,
+    windPxPerFrame: 0,
+  },
+  Medium: {
+    cleanDropChance: 0.7,
+    fakeDropChance: 0.2,
+    fallDurationSeconds: 4.4,
+    windPxPerFrame: 0,
+  },
+  Hard: {
+    cleanDropChance: 0.66,
+    fakeDropChance: 0.24,
+    fallDurationSeconds: 5,
+    windPxPerFrame: 0.55,
+  },
+  Expert: {
+    cleanDropChance: 0.62,
+    fakeDropChance: 0.28,
+    fallDurationSeconds: 5.6,
+    windPxPerFrame: 0.9,
+  },
+};
 const FAKE_DROP_FLIP_DELAY_MS = 900;
 const FAKE_DROP_WARNING_MS = 600;
 const FAKE_DROP_WARNING_DISTANCE_PX = 170;
@@ -27,7 +52,10 @@ const scoreElement = document.getElementById("score");
 const timeElement = document.getElementById("time");
 const rulesSectionElement = document.getElementById("rules-section");
 const gameBackgroundSectionElement = document.getElementById("game-background-section");
+const currentLevelElement = document.getElementById("current-level");
+const difficultyOptions = Array.from(document.querySelectorAll(".difficulty-option"));
 let rulesExpanded = true;
+let currentDifficulty = DEFAULT_DIFFICULTY;
 const CONFETTI_COLORS = [
   "#FFC907",
   "#2E9DF7",
@@ -47,31 +75,34 @@ const gameBackground = ["Charity: Water's work is driven by a belief that clean 
 
 var gameLevels = ["Easy", "Medium", "Hard", "Expert"];
 
-const difficultyLevelSelection = ["Choose your difficulty level:"];
-const difficultySelectExplanation = "Select a difficulty level to adjust the game's challenge. Higher levels increase the frequency of drops and decrease the chance of clean drops, making it more challenging to achieve a high score. Furthermore, in 'Easy' mode, you have more time to react and collect clean drops, whereas in the 'Normal', 'Hard', and 'Expert' modes, there are fake blue drops. In addition, the 'Hard' and 'Expert' modes introduce additional challenges, with wind affecting the drop movement. Choose 'Easy' for a relaxed experience or 'Expert' for a fast-paced challenge that tests your reflexes and strategy.";
-const levelSettings = {
-  "Easy": { dropFrequency: 1200, cleanDropChance: 0.8 },
-  "Medium": { dropFrequency: 1000, cleanDropChance: 0.7 },
-  "Hard": { dropFrequency: 800, cleanDropChance: 0.6 },
-  "Expert": { dropFrequency: 600, cleanDropChance: 0.5 },
-};
-
-const difficultySelect = document.getElementById("difficulty-select");
-gameLevels.forEach(level => {
-  const option = document.createElement("option");
-  option.value = level;
-  option.textContent = level;
-  difficultySelect.appendChild(option);
+function getDifficultySettings() {
+  return DIFFICULTY_SETTINGS[currentDifficulty] || DIFFICULTY_SETTINGS[DEFAULT_DIFFICULTY];
 }
-);
 
-difficultySelect.addEventListener("change", () => {
-  const selectedLevel = difficultySelect.value;
-  if (levelSettings[selectedLevel]) {
-    clearInterval(dropMaker);
-    dropMaker = setInterval(createDrop, levelSettings[selectedLevel].dropFrequency);
+function setDifficulty(level) {
+  if (!DIFFICULTY_SETTINGS[level]) return;
+
+  currentDifficulty = level;
+
+  if (currentLevelElement) {
+    currentLevelElement.textContent = level;
   }
+
+  difficultyOptions.forEach((option) => {
+    const isActive = option.dataset.level === level;
+    option.classList.toggle("active", isActive);
+    option.setAttribute("aria-current", isActive ? "true" : "false");
+  });
+}
+
+difficultyOptions.forEach((option) => {
+  option.addEventListener("click", (event) => {
+    event.preventDefault();
+    setDifficulty(option.dataset.level);
+  });
 });
+
+setDifficulty(DEFAULT_DIFFICULTY);
 
 
 function updateCatcherPosition(positionPercent) {
@@ -79,7 +110,7 @@ function updateCatcherPosition(positionPercent) {
 }
 
 function getRandomDropType() {
-  if (Math.random() < CLEAN_DROP_CHANCE) {
+  if (Math.random() < getDifficultySettings().cleanDropChance) {
     return "clean-water-drop";
   }
 
@@ -89,7 +120,7 @@ function getRandomDropType() {
 }
 
 function isFake() {
-  return Math.random() < FAKE_DROP_CHANCE;
+  return Math.random() < getDifficultySettings().fakeDropChance;
 }
 
 function renderGameBackground() {
@@ -217,9 +248,10 @@ function RulesSection() {
   const rules = [
     "Catch blue clean-water drops to earn +10 points.",
     "Green or brown dirty drops cost 10 points if caught.",
-    "20% of blue drops are fake and turn brown if not caught quickly.",
+    "Easy has no fake blue drops; Medium, Hard, and Expert include fakes.",
+    "Hard and Expert add wind that pushes drops left and right.",
     "Each clean drop fills the water bar; dirty drops reduce it.",
-    "The round lasts 30 seconds, so move quickly with the slider.",
+    "Drop fall time increases with each higher difficulty level.",
     "Use Pause, Resume, or Restart anytime during gameplay.",
   ];
 
@@ -354,6 +386,8 @@ function startGame() {
 }
 
 function createDrop() {
+  const difficultySettings = getDifficultySettings();
+
   // Create a new div element that will be our water drop
   const drop = document.createElement("div");
   drop.className = getRandomDropType();
@@ -377,7 +411,13 @@ function createDrop() {
   drop.style.top = "46px";
 
   // Make drops fall for 4 seconds
-  drop.style.animationDuration = "4s";
+  drop.style.animationDuration = `${difficultySettings.fallDurationSeconds}s`;
+
+  const windEnabled = difficultySettings.windPxPerFrame > 0;
+  let horizontalVelocity =
+    (Math.random() < 0.5 ? -1 : 1) *
+    difficultySettings.windPxPerFrame *
+    (0.6 + Math.random() * 0.8);
 
   // Add the new drop to the game screen
   gameContainer.appendChild(drop);
@@ -438,6 +478,25 @@ function createDrop() {
     if (gamePaused) {
       collisionFrameId = requestAnimationFrame(checkBucketCollision);
       return;
+    }
+
+    if (windEnabled) {
+      const maxLeft = gameContainer.clientWidth - drop.offsetWidth;
+      const currentLeft = parseFloat(drop.style.left) || 0;
+      const nextLeft = currentLeft + horizontalVelocity;
+
+      if (nextLeft <= 0 || nextLeft >= maxLeft) {
+        horizontalVelocity *= -1;
+      }
+
+      if (Math.random() < 0.02) {
+        horizontalVelocity += (Math.random() - 0.5) * 0.2;
+      }
+
+      const maxWindSpeed = difficultySettings.windPxPerFrame * 2;
+      horizontalVelocity = Math.max(-maxWindSpeed, Math.min(horizontalVelocity, maxWindSpeed));
+
+      drop.style.left = `${Math.max(0, Math.min(nextLeft, maxLeft))}px`;
     }
 
     const dropRect = drop.getBoundingClientRect();
