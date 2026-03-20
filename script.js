@@ -47,7 +47,7 @@ const gameBackground = ["Charity: Water's work is driven by a belief that clean 
 
 var gameLevels = ["Easy", "Medium", "Hard", "Expert"];
 
-const difficultyLevelSelection = ["Choose your difficulty level:", ...gameLevels];
+const difficultyLevelSelection = ["Choose your difficulty level:"];
 const difficultySelectExplanation = "Select a difficulty level to adjust the game's challenge. Higher levels increase the frequency of drops and decrease the chance of clean drops, making it more challenging to achieve a high score. Furthermore, in 'Easy' mode, you have more time to react and collect clean drops, whereas in the 'Normal', 'Hard', and 'Expert' modes, there are fake blue drops. In addition, the 'Hard' and 'Expert' modes introduce additional challenges, with wind affecting the drop movement. Choose 'Easy' for a relaxed experience or 'Expert' for a fast-paced challenge that tests your reflexes and strategy.";
 const levelSettings = {
   "Easy": { dropFrequency: 1200, cleanDropChance: 0.8 },
