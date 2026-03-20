@@ -47,6 +47,31 @@ const gameBackground = ["Charity: Water's work is driven by a belief that clean 
 
 var gameLevels = ["Easy", "Medium", "Hard", "Expert"];
 
+const difficultyLevelSelection = ["Choose your difficulty level:", ...gameLevels];
+const difficultySelectExplanation = "Select a difficulty level to adjust the game's challenge. Higher levels increase the frequency of drops and decrease the chance of clean drops, making it more challenging to achieve a high score. Furthermore, in 'Easy' mode, you have more time to react and collect clean drops, whereas in the 'Normal', 'Hard', and 'Expert' modes, there are fake blue drops. In addition, the 'Hard' and 'Expert' modes introduce additional challenges, with wind affecting the drop movement. Choose 'Easy' for a relaxed experience or 'Expert' for a fast-paced challenge that tests your reflexes and strategy.";
+const levelSettings = {
+  "Easy": { dropFrequency: 1200, cleanDropChance: 0.8 },
+  "Medium": { dropFrequency: 1000, cleanDropChance: 0.7 },
+  "Hard": { dropFrequency: 800, cleanDropChance: 0.6 },
+  "Expert": { dropFrequency: 600, cleanDropChance: 0.5 },
+};
+
+const difficultySelect = document.getElementById("difficulty-select");
+gameLevels.forEach(level => {
+  const option = document.createElement("option");
+  option.value = level;
+  option.textContent = level;
+  difficultySelect.appendChild(option);
+}
+);
+
+difficultySelect.addEventListener("change", () => {
+  const selectedLevel = difficultySelect.value;
+  if (levelSettings[selectedLevel]) {
+    clearInterval(dropMaker);
+    dropMaker = setInterval(createDrop, levelSettings[selectedLevel].dropFrequency);
+  }
+});
 
 
 function updateCatcherPosition(positionPercent) {

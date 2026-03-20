@@ -45,6 +45,26 @@
             <button id="pause-btn" hidden>Pause</button>
         </div>
         
+        <div class="dropdown ms-auto">
+          <button class="btn btn-outline-light dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-label="Select difficulty level"
+          data-i18n="difficulty-dropdown-label">
+            Difficulty: <span id="current-level">Easy</span>
+            Difficulty: <span id="current-level">Medium</span>
+            Difficulty: <span id="current-level">Hard</span>
+            Difficulty: <span id="current-level">Expert</span>      
+        </button>
+
+        <ul class = "dropdown-menu dropdown-menu-end" aria-label="Difficulty level options">
+          <li><a class="dropdown-item difficulty-option" href="#" data-level="Easy">Easy</a></li>
+          <li><a class="dropdown-item difficulty-option" href="#" data-level="Medium">Medium</a></li>
+          <li><a class="dropdown-item difficulty-option" href="#" data-level="Hard">Hard</a></li>
+          <li><a class="dropdown-item difficulty-option" href="#" data-level="Expert">Expert</a></li>
+        </ul>
+        </div>
+
         <div id="game-container">
             <div id="pause-overlay" hidden>
                 <div class="pause-panel">
