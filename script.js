@@ -65,6 +65,7 @@ const scoreElement = document.getElementById("score");
 const timeElement = document.getElementById("time");
 const volumeSlider = document.getElementById("audio-volume");
 const muteButton = document.getElementById("mute-btn");
+const audioReadyElement = document.getElementById("audio-ready");
 const rulesSectionElement = document.getElementById("rules-section");
 const gameBackgroundSectionElement = document.getElementById("game-background-section");
 const currentLevelElement = document.getElementById("current-level");
@@ -180,6 +181,60 @@ function playManagedAudio(audioElement, restart = false) {
   }
 }
 
+function setAudioReadyStatus(ready, remaining = 0) {
+  if (!audioReadyElement) return;
+
+  if (ready) {
+    audioReadyElement.textContent = "Audio: Ready";
+    audioReadyElement.classList.remove("loading");
+    audioReadyElement.classList.add("ready");
+    return;
+  }
+
+  audioReadyElement.textContent = `Audio: Loading${remaining > 0 ? ` (${remaining})` : ""}...`;
+  audioReadyElement.classList.remove("ready");
+  audioReadyElement.classList.add("loading");
+}
+
+function monitorAudioReadiness() {
+  const uniqueSplashSources = [];
+  const seenSplashSrc = new Set();
+
+  splashSoundPool.forEach((audioElement) => {
+    const sourceKey = audioElement.currentSrc || audioElement.src;
+    if (!sourceKey || seenSplashSrc.has(sourceKey)) return;
+    seenSplashSrc.add(sourceKey);
+    uniqueSplashSources.push(audioElement);
+  });
+
+  const trackedAudio = [backgroundMusic, windSound, winnerSound, ...uniqueSplashSources].filter(Boolean);
+  if (trackedAudio.length === 0) {
+    setAudioReadyStatus(true);
+    return;
+  }
+
+  let remaining = 0;
+
+  trackedAudio.forEach((audioElement) => {
+    if (audioElement.readyState >= 2) return;
+    remaining++;
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      remaining = Math.max(0, remaining - 1);
+      setAudioReadyStatus(remaining === 0, remaining);
+    };
+
+    audioElement.addEventListener("loadeddata", finish, { once: true });
+    audioElement.addEventListener("canplaythrough", finish, { once: true });
+    audioElement.addEventListener("error", finish, { once: true });
+  });
+
+  setAudioReadyStatus(remaining === 0, remaining);
+}
+
 function primeAudioBuffers() {
   [backgroundMusic, windSound, winnerSound].forEach((audioElement) => {
     if (!audioElement) return;
@@ -195,6 +250,8 @@ function primeAudioBuffers() {
     audioElement.preload = "auto";
     audioElement.load();
   });
+
+  monitorAudioReadiness();
 }
 
 difficultyOptions.forEach((option) => {
@@ -445,6 +502,7 @@ updateCatcherPosition(catcherNav.value);
 RulesSection();
 renderGameBackground();
 applyAudioSettings();
+setAudioReadyStatus(false);
 if (typeof requestIdleCallback === "function") {
   requestIdleCallback(primeAudioBuffers);
 } else {
