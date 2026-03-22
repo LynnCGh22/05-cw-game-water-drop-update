@@ -725,18 +725,31 @@ textarea {
 }
 
 .figure-arm {
-    top: 84px;
-    width: 30px;
+    top: 72px;
+    width: 40px;
 }
 
 .arm-left {
     left: 50%;
-    transform: translateX(-2px) rotate(155deg);
+    transform: translateX(-4px) rotate(212deg);
 }
 
 .arm-right {
     left: 50%;
-    transform: translateX(2px) rotate(25deg);
+    transform: translateX(4px) rotate(-32deg);
+}
+
+.figure-arm::after {
+    content: "";
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translateY(-50%);
+    background: #c4a484;
+    border: 2px solid #131313;
+    border-radius: 50%;
 }
 
 .figure-leg {
