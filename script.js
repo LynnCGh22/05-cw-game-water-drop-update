@@ -163,6 +163,28 @@ function toggleMute() {
   applyAudioSettings();
 }
 
+function playManagedAudio(audioElement, restart = false) {
+  if (!audioElement) return;
+
+  if (restart) {
+    audioElement.currentTime = 0;
+  }
+
+  const playPromise = audioElement.play();
+  if (!playPromise || typeof playPromise.catch !== "function") {
+    return;
+  }
+
+  playPromise.catch(() => {
+    const retryWhenReady = () => {
+      audioElement.play().catch(() => {});
+    };
+
+    audioElement.addEventListener("canplay", retryWhenReady, { once: true });
+    audioElement.load();
+  });
+}
+
 difficultyOptions.forEach((option) => {
   option.addEventListener("click", (event) => {
     event.preventDefault();
@@ -273,7 +295,7 @@ function syncWindAmbience() {
   if (!windSound) return;
 
   if (shouldPlayWindAmbience()) {
-    windSound.play().catch(() => {});
+    playManagedAudio(windSound);
     return;
   }
 
@@ -397,6 +419,12 @@ if (volumeSlider) {
 if (muteButton) {
   muteButton.addEventListener("click", toggleMute);
 }
+
+[backgroundMusic, windSound, winnerSound].forEach((audioElement) => {
+  if (!audioElement) return;
+  audioElement.preload = "auto";
+  audioElement.load();
+});
 
 updateCatcherPosition(catcherNav.value);
 RulesSection();
@@ -546,8 +574,7 @@ function endGame() {
   hidePauseOverlay();
   document.getElementById("pause-btn").hidden = true;
   triggerConfetti();
-  winnerSound.currentTime = 0;
-  winnerSound.play();
+  playManagedAudio(winnerSound, true);
   setTimeout(() => {
     alert(`Game Over! Your final score is: ${currentScore}`);
     timeLeft = GAME_DURATION;
@@ -572,7 +599,7 @@ function pauseGame() {
 function resumeGame() {
   gamePaused = false;
   gameRunning = true;
-  backgroundMusic.play();
+  playManagedAudio(backgroundMusic);
   syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
@@ -601,7 +628,7 @@ function restartGame() {
   timeLeft = GAME_DURATION;
   timeElement.textContent = GAME_DURATION;
   gameRunning = true;
-  backgroundMusic.play();
+  playManagedAudio(backgroundMusic);
   syncWindAmbience();
   startTimer();
   dropMaker = setInterval(createDrop, 1000);
@@ -643,8 +670,7 @@ function startGame() {
   timeElement.textContent = timeLeft;
   document.getElementById("pause-btn").hidden = false;
 
-  backgroundMusic.currentTime = 0;
-  backgroundMusic.play();
+  playManagedAudio(backgroundMusic, true);
   syncWindAmbience();
   startTimer();
 
