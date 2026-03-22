@@ -82,7 +82,6 @@ const splashSoundPool = SPLASH_SOUND_PATHS.flatMap((path) =>
 let splashSoundIndex = 0;
 let masterVolume = DEFAULT_MASTER_VOLUME;
 let isAudioMuted = false;
-let audioUnlocked = false;
 let rulesExpanded = true;
 let currentDifficulty = DEFAULT_DIFFICULTY;
 const CONFETTI_COLORS = [
@@ -168,35 +167,6 @@ function toggleMute() {
   applyAudioSettings();
 }
 
-function unlockAudioIfNeeded() {
-  if (audioUnlocked) return;
-
-  const primaryAudio = [backgroundMusic, windSound, winnerSound].filter(Boolean);
-
-  primaryAudio.forEach((audioElement) => {
-    const previousMuted = audioElement.muted;
-    const previousTime = audioElement.currentTime;
-    audioElement.muted = true;
-
-    const attempt = audioElement.play();
-    if (attempt && typeof attempt.then === "function") {
-      attempt
-        .then(() => {
-          audioElement.pause();
-          audioElement.currentTime = previousTime;
-          audioElement.muted = previousMuted;
-        })
-        .catch(() => {
-          audioElement.muted = previousMuted;
-        });
-    } else {
-      audioElement.muted = previousMuted;
-    }
-  });
-
-  audioUnlocked = true;
-}
-
 function playManagedAudio(audioElement, restart = false) {
   if (!audioElement) return;
 
@@ -208,6 +178,23 @@ function playManagedAudio(audioElement, restart = false) {
   if (playPromise && typeof playPromise.catch === "function") {
     playPromise.catch(() => {});
   }
+}
+
+function primeAudioBuffers() {
+  [backgroundMusic, windSound, winnerSound].forEach((audioElement) => {
+    if (!audioElement) return;
+    audioElement.preload = "auto";
+    audioElement.load();
+  });
+
+  const primedSplashSources = new Set();
+  splashSoundPool.forEach((audioElement) => {
+    const sourceKey = audioElement.currentSrc || audioElement.src;
+    if (!sourceKey || primedSplashSources.has(sourceKey)) return;
+    primedSplashSources.add(sourceKey);
+    audioElement.preload = "auto";
+    audioElement.load();
+  });
 }
 
 difficultyOptions.forEach((option) => {
@@ -458,6 +445,11 @@ updateCatcherPosition(catcherNav.value);
 RulesSection();
 renderGameBackground();
 applyAudioSettings();
+if (typeof requestIdleCallback === "function") {
+  requestIdleCallback(primeAudioBuffers);
+} else {
+  setTimeout(primeAudioBuffers, 0);
+}
 reportRenderedFont();
 
 if (document.fonts && document.fonts.ready) {
@@ -687,8 +679,6 @@ function endGameAndReset() {
 function startGame() {
   // Prevent multiple games from running at once
   if (gameRunning || gamePaused) return;
-
-  unlockAudioIfNeeded();
 
   gameRunning = true;
   currentScore = 0;
