@@ -21,6 +21,34 @@ Fonts:
 */
 @import "tailwindcss";
 
+@font-face {
+    font-family: "Proxima Nova";
+    src:
+        local("Proxima Nova"),
+        local("ProximaNova-Regular"),
+        url("fonts/ProximaNova-Regular.woff2") format("woff2"),
+        url("fonts/ProximaNova-Regular.woff") format("woff");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Avenir";
+    src:
+        local("Avenir"),
+        local("Avenir Book"),
+        url("fonts/Avenir-Book.woff2") format("woff2"),
+        url("fonts/Avenir-Book.woff") format("woff");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+:root {
+    --font-brand-sans: "Proxima Nova", "Avenir", "Avenir Next", "Segoe UI", sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -34,9 +62,16 @@ body {
     min-height: 100vh;
     background: linear-gradient(135deg, #2E9DF7 0%, #4FCB53 100%);
     scrollbar-color: #FFC907;
-    font-family: "Proxima Nova", "Avenir", sans-serif;
+    font-family: var(--font-brand-sans);
     overflow-y: auto;
     padding: 16px 0;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
 }
 
 .corner-logo {
