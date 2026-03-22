@@ -575,7 +575,11 @@ function createDrop() {
   const fakeDropSpawnTime = performance.now();
   const fallDurationMs = difficultySettings.fallDurationSeconds * 1000;
   const dropHeight = drop.getBoundingClientRect().height || size;
-  const finalTop = gameContainer.clientHeight + dropHeight;
+  // Keep fall speed proportional to the game area for consistent pacing
+  // across different screen sizes. The multiplier is tuned to preserve
+  // the current gameplay feel.
+  const travelDistance = gameContainer.clientHeight * 1.8 + dropHeight;
+  const finalTop = startTop + travelDistance;
   let elapsedFallMs = 0;
   let lastFrameTime = performance.now();
 
