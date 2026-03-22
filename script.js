@@ -103,7 +103,6 @@ difficultyOptions.forEach((option) => {
 });
 
 setDifficulty(DEFAULT_DIFFICULTY);
-resetDropColorCounts();
 
 let blueCleanCount = 0;
 let greenPollutedCount = 0;
@@ -168,6 +167,8 @@ function WaterDropTypeTracker(isFake) {
     tracker.textContent = `Last drop type: ${isFake ? "Fake" : "Real"}`;
   }
 }
+
+resetDropColorCounts();
 
 function updateCatcherPosition(positionPercent) {
   catcher.style.left = `${positionPercent}%`;
