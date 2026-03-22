@@ -168,20 +168,20 @@ body {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -22px;
+    bottom: 0;
     height: 22px;
     background: linear-gradient(180deg, #3D2B1F 0%, #4B3621 100%);
-    z-index: 0;
+    z-index: 1;
 }
 
 .grass {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
-    height: 62px;
+    bottom: 22px;
+    height: 40px;
     background: linear-gradient(180deg, #4FCB53 0%, #159A48 60%);
-    z-index: 1;
+    z-index: 2;
 }
 
 .grass::before {
