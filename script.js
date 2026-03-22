@@ -56,6 +56,7 @@ const waterBarFill = document.getElementById("score-bar");
 const catcher = document.querySelector(".catcher");
 const bucket = document.querySelector(".bucket");
 const grass = document.querySelector(".grass");
+const sunray = document.querySelector(".sunray");
 const gameContainer = document.getElementById("game-container");
 const clouds = Array.from(document.querySelectorAll(".cloud"));
 const catcherNav = document.getElementById("catcher-nav");

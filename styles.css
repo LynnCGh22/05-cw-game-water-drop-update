@@ -231,6 +231,17 @@ textarea {
         0 0 / 58px 22px repeat-x;
 }
 
+.sunray {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at center, rgba(243, 238, 212, 0.8) 0%, transparent 70%);
+    transform: translateX(-50%);
+    z-index: 0;
+}
+
 #start-btn {
     padding: 8px 16px;
     background-color: #FFC907;
