@@ -82,6 +82,7 @@ const splashSoundPool = SPLASH_SOUND_PATHS.flatMap((path) =>
 let splashSoundIndex = 0;
 let masterVolume = DEFAULT_MASTER_VOLUME;
 let isAudioMuted = false;
+let audioUnlocked = false;
 let rulesExpanded = true;
 let currentDifficulty = DEFAULT_DIFFICULTY;
 const CONFETTI_COLORS = [
@@ -167,6 +168,35 @@ function toggleMute() {
   applyAudioSettings();
 }
 
+function unlockAudioIfNeeded() {
+  if (audioUnlocked) return;
+
+  const primaryAudio = [backgroundMusic, windSound, winnerSound].filter(Boolean);
+
+  primaryAudio.forEach((audioElement) => {
+    const previousMuted = audioElement.muted;
+    const previousTime = audioElement.currentTime;
+    audioElement.muted = true;
+
+    const attempt = audioElement.play();
+    if (attempt && typeof attempt.then === "function") {
+      attempt
+        .then(() => {
+          audioElement.pause();
+          audioElement.currentTime = previousTime;
+          audioElement.muted = previousMuted;
+        })
+        .catch(() => {
+          audioElement.muted = previousMuted;
+        });
+    } else {
+      audioElement.muted = previousMuted;
+    }
+  });
+
+  audioUnlocked = true;
+}
+
 function playManagedAudio(audioElement, restart = false) {
   if (!audioElement) return;
 
@@ -175,18 +205,9 @@ function playManagedAudio(audioElement, restart = false) {
   }
 
   const playPromise = audioElement.play();
-  if (!playPromise || typeof playPromise.catch !== "function") {
-    return;
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {});
   }
-
-  playPromise.catch(() => {
-    const retryWhenReady = () => {
-      audioElement.play().catch(() => {});
-    };
-
-    audioElement.addEventListener("canplay", retryWhenReady, { once: true });
-    audioElement.load();
-  });
 }
 
 difficultyOptions.forEach((option) => {
@@ -431,11 +452,6 @@ if (muteButton) {
 [backgroundMusic, windSound, winnerSound].forEach((audioElement) => {
   if (!audioElement) return;
   audioElement.preload = "auto";
-  audioElement.load();
-});
-
-splashSoundPool.forEach((audioElement) => {
-  audioElement.load();
 });
 
 updateCatcherPosition(catcherNav.value);
@@ -671,6 +687,8 @@ function endGameAndReset() {
 function startGame() {
   // Prevent multiple games from running at once
   if (gameRunning || gamePaused) return;
+
+  unlockAudioIfNeeded();
 
   gameRunning = true;
   currentScore = 0;
