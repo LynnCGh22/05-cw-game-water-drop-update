@@ -41,6 +41,7 @@ const BACKGROUND_MUSIC_VOLUME = 0.55;
 const WINNER_SOUND_VOLUME = 0.9;
 const WIND_AMBIENCE_VOLUME = 0.35;
 const WIND_AMBIENCE_LEVELS = new Set(["Hard", "Expert"]);
+const SPLASH_VOICES_PER_SOUND = 3;
 const SPLASH_SOUND_PATHS = [
   "audio/bbc_water---la_07044109.mp3",
   "audio/bbc_water---sm_07044110.mp3",
@@ -71,11 +72,14 @@ const difficultyOptions = Array.from(document.querySelectorAll(".difficulty-opti
 const backgroundMusic = document.getElementById("background-music");
 const windSound = document.getElementById("wind-sound");
 const winnerSound = document.getElementById("winner-sound");
-const splashSoundPool = SPLASH_SOUND_PATHS.map((path) => {
-  const audio = new Audio(path);
-  audio.preload = "auto";
-  return audio;
-});
+const splashSoundPool = SPLASH_SOUND_PATHS.flatMap((path) =>
+  Array.from({ length: SPLASH_VOICES_PER_SOUND }, () => {
+    const audio = new Audio(path);
+    audio.preload = "auto";
+    return audio;
+  })
+);
+let splashSoundIndex = 0;
 let masterVolume = DEFAULT_MASTER_VOLUME;
 let isAudioMuted = false;
 let rulesExpanded = true;
@@ -306,11 +310,15 @@ function syncWindAmbience() {
 function playRandomSplashSound() {
   if (splashSoundPool.length === 0) return;
 
-  const baseSound = splashSoundPool[Math.floor(Math.random() * splashSoundPool.length)];
-  const sound = baseSound.cloneNode();
+  // Round-robin through preloaded channels to avoid dropped sounds
+  // when multiple splashes happen close together.
+  const sound = splashSoundPool[splashSoundIndex % splashSoundPool.length];
+  splashSoundIndex++;
+
+  sound.currentTime = 0;
   sound.volume = (0.32 + Math.random() * 0.26) * getEffectiveMasterVolume();
   sound.playbackRate = 0.92 + Math.random() * 0.16;
-  sound.play().catch(() => {});
+  playManagedAudio(sound);
 }
 
 
@@ -423,6 +431,10 @@ if (muteButton) {
 [backgroundMusic, windSound, winnerSound].forEach((audioElement) => {
   if (!audioElement) return;
   audioElement.preload = "auto";
+  audioElement.load();
+});
+
+splashSoundPool.forEach((audioElement) => {
   audioElement.load();
 });
 
