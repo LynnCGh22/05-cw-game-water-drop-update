@@ -39,7 +39,7 @@ const FAKE_DROP_FLIP_DISTANCE_PX = 95;
 const DEFAULT_MASTER_VOLUME = 0.7;
 const BACKGROUND_MUSIC_VOLUME = 0.55;
 const WINNER_SOUND_VOLUME = 0.9;
-const WIND_AMBIENCE_VOLUME = 0.32;
+const WIND_AMBIENCE_VOLUME = 0.35;
 const WIND_AMBIENCE_LEVELS = new Set(["Hard", "Expert"]);
 const SPLASH_SOUND_PATHS = [
   "audio/bbc_water---la_07044109.mp3",
