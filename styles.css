@@ -748,7 +748,7 @@ textarea {
     height: 8px;
     transform: translateY(-50%);
     background: #c4a484;
-    border: 2px solid #131313;
+    border: 2px solid black;
     border-radius: 50%;
 }
 
@@ -775,8 +775,8 @@ textarea {
     width: 9px;
     height: 9px;
     transform: translateY(-50%);
-    background: #7b4c24;
-    border: 2px solid #131313;
+    background: #c4a484;
+    border: 2px solid black;
     border-radius: 50%;
 }
 
@@ -785,7 +785,7 @@ textarea {
 }
 
 .game-title {
-    color: #131313;
+    color: black;
     font-size: 48px;
     margin-top: 0;
     margin-bottom: 5px;  /* reduced from 20px */
