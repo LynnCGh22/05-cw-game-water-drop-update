@@ -352,7 +352,7 @@ function startTimer() {
     timeLeft--;
     timeElement.textContent = timeLeft;
     if(timeLeft === 10) {
-      print("10 seconds remaining!");
+      displayMessage("10 seconds left! Keep going!", 2000);
     }
     if (timeLeft <= 0) {
       endGame();
