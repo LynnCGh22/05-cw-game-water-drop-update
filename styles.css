@@ -319,6 +319,41 @@ textarea {
     font-weight: bold;
 }
 
+.audio-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.audio-label {
+    color: #1d4f73;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+#audio-volume {
+    width: 130px;
+    accent-color: #2E9DF7;
+    cursor: pointer;
+}
+
+#mute-btn {
+    padding: 8px 14px;
+    background-color: #1d4f73;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#mute-btn:hover {
+    background-color: #133a56;
+}
+
 .font-debug {
     margin: 4px 0 0;
     width: 800px;
@@ -821,6 +856,19 @@ textarea {
     #start-btn, #pause-btn {
         font-size: 13px;
         padding: 6px 10px;
+    }
+
+    #mute-btn {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    .audio-label {
+        font-size: 11px;
+    }
+
+    #audio-volume {
+        width: 92px;
     }
 
     .pause-panel {

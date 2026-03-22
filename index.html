@@ -56,6 +56,18 @@
 
             <div class="score-panel">
                 <div class="timer">Time: <span id="time">30</span>s</div>
+                <label class="audio-control" for="audio-volume" aria-label="Audio volume control">
+                    <span class="audio-label">Volume</span>
+                    <input
+                        type="range"
+                        id="audio-volume"
+                        min="0"
+                        max="100"
+                        value="70"
+                        aria-label="Set game volume"
+                    >
+                </label>
+                <button id="mute-btn" type="button" aria-pressed="false">Mute</button>
                 <button id="start-btn">Start Game</button>
                 <button id="pause-btn" hidden>Pause</button>
             </div>
@@ -143,6 +155,17 @@
         </label>
     </div>
     
+    <!-- Audio elements for background music and sound effects -->
+    <audio id="background-music" loop>
+        <source src="audio/joyinsound-corporate-upbeat-motivational-music-royalty-free-496474.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="wind-sound" loop>
+        <source src="audio/bbc_wind---blu_nhu0503906.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="winner-sound">
+        <source src="audio/superpuyofans1234-winner-game-sound-404167%20%281%29.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Bootstrap JS Bundle (required for dropdowns) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>

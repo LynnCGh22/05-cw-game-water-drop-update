@@ -36,6 +36,17 @@ const FAKE_DROP_FLIP_DELAY_MS = 900;
 const FAKE_DROP_WARNING_MS = 600;
 const FAKE_DROP_WARNING_DISTANCE_PX = 170;
 const FAKE_DROP_FLIP_DISTANCE_PX = 95;
+const DEFAULT_MASTER_VOLUME = 0.7;
+const BACKGROUND_MUSIC_VOLUME = 0.55;
+const WINNER_SOUND_VOLUME = 0.9;
+const WIND_AMBIENCE_VOLUME = 0.18;
+const WIND_AMBIENCE_LEVELS = new Set(["Hard", "Expert"]);
+const SPLASH_SOUND_PATHS = [
+  "audio/bbc_water---la_07044109.mp3",
+  "audio/bbc_water---sm_07044110.mp3",
+  "audio/universfield-water-splash-199583.mp3",
+  "audio/dragon-studio-water-splash-effect-443133.mp3",
+];
 const SCORE_PER_CLEAN_DROP = 10;
 const SCORE_PER_DIRTY_DROP = -10;
 const MAX_WATER_SCORE = 100; // 10 clean drops fills the bar
@@ -50,10 +61,22 @@ const clouds = Array.from(document.querySelectorAll(".cloud"));
 const catcherNav = document.getElementById("catcher-nav");
 const scoreElement = document.getElementById("score");
 const timeElement = document.getElementById("time");
+const volumeSlider = document.getElementById("audio-volume");
+const muteButton = document.getElementById("mute-btn");
 const rulesSectionElement = document.getElementById("rules-section");
 const gameBackgroundSectionElement = document.getElementById("game-background-section");
 const currentLevelElement = document.getElementById("current-level");
 const difficultyOptions = Array.from(document.querySelectorAll(".difficulty-option"));
+const backgroundMusic = document.getElementById("background-music");
+const windSound = document.getElementById("wind-sound");
+const winnerSound = document.getElementById("winner-sound");
+const splashSoundPool = SPLASH_SOUND_PATHS.map((path) => {
+  const audio = new Audio(path);
+  audio.preload = "auto";
+  return audio;
+});
+let masterVolume = DEFAULT_MASTER_VOLUME;
+let isAudioMuted = false;
 let rulesExpanded = true;
 let currentDifficulty = DEFAULT_DIFFICULTY;
 const CONFETTI_COLORS = [
@@ -93,6 +116,50 @@ function setDifficulty(level) {
     option.classList.toggle("active", isActive);
     option.setAttribute("aria-current", isActive ? "true" : "false");
   });
+
+  syncWindAmbience();
+}
+
+function getEffectiveMasterVolume() {
+  return isAudioMuted ? 0 : masterVolume;
+}
+
+function applyAudioSettings() {
+  const effectiveVolume = getEffectiveMasterVolume();
+
+  if (backgroundMusic) {
+    backgroundMusic.volume = BACKGROUND_MUSIC_VOLUME * effectiveVolume;
+  }
+
+  if (windSound) {
+    windSound.volume = WIND_AMBIENCE_VOLUME * effectiveVolume;
+  }
+
+  if (winnerSound) {
+    winnerSound.volume = WINNER_SOUND_VOLUME * effectiveVolume;
+  }
+
+  if (muteButton) {
+    muteButton.textContent = isAudioMuted ? "Unmute" : "Mute";
+    muteButton.setAttribute("aria-pressed", String(isAudioMuted));
+  }
+
+  if (volumeSlider) {
+    volumeSlider.value = String(Math.round(masterVolume * 100));
+  }
+}
+
+function handleVolumeChange(event) {
+  const sliderValue = Number(event.target.value);
+  const normalized = Number.isFinite(sliderValue) ? sliderValue / 100 : DEFAULT_MASTER_VOLUME;
+  masterVolume = Math.max(0, Math.min(1, normalized));
+  isAudioMuted = masterVolume === 0;
+  applyAudioSettings();
+}
+
+function toggleMute() {
+  isAudioMuted = !isAudioMuted;
+  applyAudioSettings();
 }
 
 difficultyOptions.forEach((option) => {
@@ -197,6 +264,32 @@ function renderGameBackground() {
   target.replaceChildren(paragraph);
 }
 
+function shouldPlayWindAmbience() {
+  return gameRunning && WIND_AMBIENCE_LEVELS.has(currentDifficulty);
+}
+
+function syncWindAmbience() {
+  if (!windSound) return;
+
+  if (shouldPlayWindAmbience()) {
+    windSound.play().catch(() => {});
+    return;
+  }
+
+  windSound.pause();
+  windSound.currentTime = 0;
+}
+
+function playRandomSplashSound() {
+  if (splashSoundPool.length === 0) return;
+
+  const baseSound = splashSoundPool[Math.floor(Math.random() * splashSoundPool.length)];
+  const sound = baseSound.cloneNode();
+  sound.volume = (0.32 + Math.random() * 0.26) * getEffectiveMasterVolume();
+  sound.playbackRate = 0.92 + Math.random() * 0.16;
+  sound.play().catch(() => {});
+}
+
 
 
 function updateScoreDisplay() {
@@ -297,10 +390,17 @@ document.getElementById("end-btn").addEventListener("click", endGameAndReset);
 catcherNav.addEventListener("input", (event) => {
   updateCatcherPosition(event.target.value);
 });
+if (volumeSlider) {
+  volumeSlider.addEventListener("input", handleVolumeChange);
+}
+if (muteButton) {
+  muteButton.addEventListener("click", toggleMute);
+}
 
 updateCatcherPosition(catcherNav.value);
 RulesSection();
 renderGameBackground();
+applyAudioSettings();
 reportRenderedFont();
 
 if (document.fonts && document.fonts.ready) {
@@ -437,12 +537,16 @@ function endGame() {
   gamePaused = false;
   clearInterval(dropMaker);
   clearInterval(timerInterval);
+  backgroundMusic.pause();
+  syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
     .forEach((drop) => drop.remove());
   hidePauseOverlay();
   document.getElementById("pause-btn").hidden = true;
   triggerConfetti();
+  winnerSound.currentTime = 0;
+  winnerSound.play();
   setTimeout(() => {
     alert(`Game Over! Your final score is: ${currentScore}`);
     timeLeft = GAME_DURATION;
@@ -456,6 +560,8 @@ function pauseGame() {
   gamePaused = true;
   clearInterval(dropMaker);
   clearInterval(timerInterval);
+  backgroundMusic.pause();
+  syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
     .forEach((d) => (d.style.animationPlayState = "paused"));
@@ -465,6 +571,8 @@ function pauseGame() {
 function resumeGame() {
   gamePaused = false;
   gameRunning = true;
+  backgroundMusic.play();
+  syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
     .forEach((d) => (d.style.animationPlayState = "running"));
@@ -477,6 +585,9 @@ function restartGame() {
   clearInterval(dropMaker);
   clearInterval(timerInterval);
   gamePaused = false;
+  backgroundMusic.pause();
+  backgroundMusic.currentTime = 0;
+  syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
     .forEach((drop) => drop.remove());
@@ -489,6 +600,8 @@ function restartGame() {
   timeLeft = GAME_DURATION;
   timeElement.textContent = GAME_DURATION;
   gameRunning = true;
+  backgroundMusic.play();
+  syncWindAmbience();
   startTimer();
   dropMaker = setInterval(createDrop, 1000);
 }
@@ -498,6 +611,9 @@ function endGameAndReset() {
   clearInterval(timerInterval);
   gameRunning = false;
   gamePaused = false;
+  backgroundMusic.pause();
+  backgroundMusic.currentTime = 0;
+  syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
     .forEach((drop) => drop.remove());
@@ -526,6 +642,9 @@ function startGame() {
   timeElement.textContent = timeLeft;
   document.getElementById("pause-btn").hidden = false;
 
+  backgroundMusic.currentTime = 0;
+  backgroundMusic.play();
+  syncWindAmbience();
   startTimer();
 
   // Create new drops every second (1000 milliseconds)
@@ -604,6 +723,7 @@ function createDrop() {
     cancelAnimationFrame(collisionFrameId);
 
     if (caughtByBucket) {
+      playRandomSplashSound();
       WaterDropColorTracker(drop);
       currentScore += getDropScore(drop);
       updateScoreDisplay();
@@ -621,6 +741,7 @@ function createDrop() {
     }
 
     if (hitGrass) {
+      playRandomSplashSound();
       drop.style.animationPlayState = "paused";
       drop.classList.add("splash");
       setTimeout(() => drop.remove(), 300);
