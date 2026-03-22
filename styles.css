@@ -164,6 +164,16 @@ body {
     letter-spacing: 0.03em;
 }
 
+.brown-terrain-under-grass {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -22px;
+    height: 22px;
+    background: linear-gradient(180deg, #3D2B1F 0%, #4B3621 100%);
+    z-index: 0;
+}
+
 .grass {
     position: absolute;
     left: 0;
@@ -184,16 +194,6 @@ body {
     background:
         radial-gradient(ellipse 30px 18px at 50% 100%, #4FCB53 70%, transparent 72%)
         0 0 / 58px 22px repeat-x;
-}
-
-.brown-terrain-under-grass {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 62px;
-    background: linear-gradient(180deg, #3D2B1F 0%, #4B3621 100%);
-    z-index: 2;
 }
 
 #start-btn {
