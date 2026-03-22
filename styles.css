@@ -89,7 +89,18 @@ body {
 
 .score-panel {
     display: flex;
-    justify-content: space-between;  /* Space between score and button */
+    justify-content: flex-start;
+    align-items: center;
+    gap: 24px;
+    width: 800px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.score-box {
+    display: flex;
     align-items: center;
     width: 800px;
     padding: 10px;
@@ -252,9 +263,13 @@ body {
 }
 
 .score {
-    flex: 0 1 auto;  /* Don't grow, can shrink, auto basis */
+    flex: 0 1 auto;
     font-size: 24px;
     font-weight: bold;
+}
+
+#start-btn {
+    margin-left: auto;
 }
 
 .difficulty-bar {
