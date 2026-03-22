@@ -22,13 +22,13 @@ const DIFFICULTY_SETTINGS = {
   Hard: {
     cleanDropChance: 0.66,
     fakeDropChance: 0.24,
-    fallDurationSeconds: 5,
+    fallDurationSeconds: 4,
     windPxPerFrame: 0.55,
   },
   Expert: {
     cleanDropChance: 0.62,
     fakeDropChance: 0.28,
-    fallDurationSeconds: 5.6,
+    fallDurationSeconds: 3.3,
     windPxPerFrame: 0.9,
   },
 };
@@ -251,7 +251,7 @@ function RulesSection() {
     "Easy has no fake blue drops; Medium, Hard, and Expert include fakes.",
     "Hard and Expert add wind that pushes drops left and right.",
     "Each clean drop fills the water bar; dirty drops reduce it.",
-    "Drop fall time increases with each higher difficulty level.",
+    "Hard and Expert drops fall faster, so react quickly.",
     "Use Pause, Resume, or Restart anytime during gameplay.",
   ];
 
