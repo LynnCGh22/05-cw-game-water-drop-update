@@ -269,6 +269,43 @@ body {
     box-shadow: 0 8px 20px rgba(17, 54, 79, 0.12);
 }
 
+.counter-box {
+    width: 800px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 2px solid rgba(29, 79, 115, 0.18);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(17, 54, 79, 0.12);
+}
+
+.counter-title {
+    margin: 0;
+    font-size: 15px;
+    color: #1d4f73;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.counter-status {
+    margin: 8px 0 8px;
+    color: #133a56;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.counter-list {
+    margin: 0;
+    padding-left: 18px;
+    color: #133a56;
+    line-height: 1.5;
+}
+
+.counter-type {
+    margin: 8px 0 0;
+    color: #1d4f73;
+    font-size: 13px;
+}
+
 .difficulty-title {
     color: #1d4f73;
     font-size: 14px;
@@ -635,7 +672,7 @@ body {
 }
 
 @media (max-width: 850px) {
-    .game-wrapper, .score-panel, #game-container, .movement-nav, .rules-section, .const-game-background, .difficulty-bar {
+    .game-wrapper, .score-panel, #game-container, .movement-nav, .rules-section, .const-game-background, .difficulty-bar, .counter-box {
         width: 95vw;
     }
 

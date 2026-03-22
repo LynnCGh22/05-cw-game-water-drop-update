@@ -44,6 +44,17 @@
             <button id="start-btn">Start Game</button>
             <button id="pause-btn" hidden>Pause</button>
         </div>
+
+        <section class="counter-box" aria-live="polite" aria-label="Water drop color counter">
+            <h2 class="counter-title">Drop Counter</h2>
+            <p id="water-drop-color-tracker" class="counter-status">No drops caught yet.</p>
+            <ul class="counter-list">
+                <li>Blue Clean Drops: <span id="blue-clean-count">0</span></li>
+                <li>Green Polluted Drops: <span id="green-polluted-count">0</span></li>
+                <li>Brown Toxic Drops: <span id="brown-toxic-count">0</span></li>
+            </ul>
+            <p id="water-drop-type-tracker" class="counter-type" aria-live="polite"></p>
+        </section>
         
         <div class="difficulty-bar" aria-label="Difficulty selector">
             <span class="difficulty-title">Difficulty</span>
@@ -67,16 +78,6 @@
                 </ul>
             </div>
         </div>
-
-        <div id = "water-drop-color-tracker" aria-live="polite"></div>
-            <div id ="water-drop-type-tracker" aria-live="polite"></div>
-                <div id ="catcher-position-tracker" aria-live="polite"></div>
-                  <li><a class="blue-clean-drop-count" href="#" aria-label="Number of blue clean drops caught">Blue Clean Drops: <span id="blue-clean-count">0</span></a></li>
-                  <li><a class="green-polluted-drop-count" href="#" aria-label="Number of green polluted drops caught">Green Polluted Drops: <span id="green-polluted-count">0</span></a></li>
-                  <li><a class="brown-toxic-drop-count" href="#" aria-label="Number of brown toxic drops caught">Brown Toxic Drops: <span id="brown-toxic-count">0</span></a></li>
-              </ul>
-            </div>
-          </div>
 
         <div id="game-container">
             <div id="pause-overlay" hidden>
