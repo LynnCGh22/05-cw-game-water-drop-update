@@ -555,10 +555,11 @@ function createDrop() {
   // Subtract 60 pixels to keep drops fully inside the container
   const xPosition = getDropStartX(size);
   drop.style.left = xPosition + "px";
-  drop.style.top = "46px";
-
-  // Make drops fall for 4 seconds
-  drop.style.animationDuration = `${difficultySettings.fallDurationSeconds}s`;
+  const startTop = 46;
+  drop.style.top = `${startTop}px`;
+  // Use frame-based movement for the Y-axis so drops cannot disappear early
+  // due to CSS animation timing/stacking edge cases.
+  drop.style.animation = "none";
 
   const windEnabled = difficultySettings.windPxPerFrame > 0;
   let horizontalVelocity =
@@ -572,6 +573,11 @@ function createDrop() {
   let dropResolved = false;
   let collisionFrameId;
   const fakeDropSpawnTime = performance.now();
+  const fallDurationMs = difficultySettings.fallDurationSeconds * 1000;
+  const dropHeight = drop.getBoundingClientRect().height || size;
+  const finalTop = gameContainer.clientHeight + dropHeight;
+  let elapsedFallMs = 0;
+  let lastFrameTime = performance.now();
 
   function flipFakeDrop() {
     if (
@@ -623,10 +629,19 @@ function createDrop() {
   function checkBucketCollision() {
     if (dropResolved || !drop.isConnected) return;
 
+    const now = performance.now();
+    const deltaMs = now - lastFrameTime;
+    lastFrameTime = now;
+
     if (gamePaused) {
       collisionFrameId = requestAnimationFrame(checkBucketCollision);
       return;
     }
+
+    elapsedFallMs += deltaMs;
+    const fallProgress = Math.min(elapsedFallMs / fallDurationMs, 1);
+    const currentTop = startTop + (finalTop - startTop) * fallProgress;
+    drop.style.top = `${currentTop}px`;
 
     if (windEnabled) {
       const maxLeft = gameContainer.clientWidth - drop.offsetWidth;
@@ -676,6 +691,11 @@ function createDrop() {
     }
 
     if (intersects(dropRect, grassRect)) {
+      resolveDrop(false, true);
+      return;
+    }
+
+    if (fallProgress >= 1) {
       resolveDrop(false, true);
       return;
     }

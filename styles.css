@@ -481,7 +481,7 @@ textarea {
     padding: 15px;  /* Add padding for larger click area */
     margin: -15px;  /* Offset padding to maintain visual size */
     transition: transform 0.1s ease;  /* Smooth hover effect */
-    z-index: 3;
+    z-index: 6;
 }
 
 .dirty-water-drop-brown {
@@ -496,7 +496,7 @@ textarea {
     padding: 15px;  /* Add padding for larger click area */
     margin: -15px;  /* Offset padding to maintain visual size */
     transition: transform 0.1s ease;  /* Smooth hover effect */
-    z-index: 3;
+    z-index: 6;
 }
 
 .dirty-water-drop-green {
@@ -511,7 +511,7 @@ textarea {
     padding: 15px;  /* Add padding for larger click area */
     margin: -15px;  /* Offset padding to maintain visual size */
     transition: transform 0.1s ease;  /* Smooth hover effect */
-    z-index: 3;
+    z-index: 6;
 }
 
 .fake-drop {
