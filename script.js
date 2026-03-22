@@ -103,7 +103,71 @@ difficultyOptions.forEach((option) => {
 });
 
 setDifficulty(DEFAULT_DIFFICULTY);
+resetDropColorCounts();
 
+let blueCleanCount = 0;
+let greenPollutedCount = 0;
+let brownPollutedCount = 0;
+
+function renderDropColorCounts() {
+  const blueCountElement = document.getElementById("blue-clean-count");
+  const greenCountElement = document.getElementById("green-polluted-count");
+  const brownCountElement = document.getElementById("brown-toxic-count");
+
+  if (blueCountElement) {
+    blueCountElement.textContent = blueCleanCount;
+  }
+
+  if (greenCountElement) {
+    greenCountElement.textContent = greenPollutedCount;
+  }
+
+  if (brownCountElement) {
+    brownCountElement.textContent = brownPollutedCount;
+  }
+}
+
+function resetDropColorCounts() {
+  blueCleanCount = 0;
+  greenPollutedCount = 0;
+  brownPollutedCount = 0;
+  renderDropColorCounts();
+
+  const tracker = document.getElementById("water-drop-color-tracker");
+  if (tracker) {
+    tracker.textContent = "No drops caught yet.";
+  }
+}
+
+function WaterDropColorTracker(drop) {
+  const tracker = document.getElementById("water-drop-color-tracker");
+
+  if (drop.classList.contains("clean-water-drop")) {
+    blueCleanCount++;
+    if (tracker) {
+      tracker.textContent = `Number of blue clean drops caught: ${blueCleanCount}`;
+    }
+  } else if (drop.classList.contains("dirty-water-drop-green")) {
+    greenPollutedCount++;
+    if (tracker) {
+      tracker.textContent = `Number of green polluted drops caught: ${greenPollutedCount}`;
+    }
+  } else if (drop.classList.contains("dirty-water-drop-brown")) {
+    brownPollutedCount++;
+    if (tracker) {
+      tracker.textContent = `Number of brown toxic drops caught: ${brownPollutedCount}`;
+    }
+  }
+
+  renderDropColorCounts();
+}
+
+function WaterDropTypeTracker(isFake) {
+  const tracker = document.getElementById("water-drop-type-tracker");
+  if (tracker) {
+    tracker.textContent = `Last drop type: ${isFake ? "Fake" : "Real"}`;
+  }
+}
 
 function updateCatcherPosition(positionPercent) {
   catcher.style.left = `${positionPercent}%`;
@@ -339,6 +403,7 @@ function restartGame() {
   hidePauseOverlay();
   currentScore = 0;
   waterCollected = 0;
+  resetDropColorCounts();
   updateScoreDisplay();
   updateWaterBar();
   timeLeft = GAME_DURATION;
@@ -360,6 +425,7 @@ function endGameAndReset() {
   document.getElementById("pause-btn").hidden = true;
   currentScore = 0;
   waterCollected = 0;
+  resetDropColorCounts();
   updateScoreDisplay();
   updateWaterBar();
   timeLeft = GAME_DURATION;
@@ -373,6 +439,7 @@ function startGame() {
   gameRunning = true;
   currentScore = 0;
   waterCollected = 0;
+  resetDropColorCounts();
   updateWaterBar();
   updateScoreDisplay();
   timeLeft = GAME_DURATION;
@@ -447,6 +514,7 @@ function createDrop() {
     cancelAnimationFrame(collisionFrameId);
 
     if (caughtByBucket) {
+      WaterDropColorTracker(drop);
       currentScore += getDropScore(drop);
       updateScoreDisplay();
       if (drop.classList.contains("clean-water-drop")) {
