@@ -38,26 +38,28 @@
         <section id="game-background-section" class="const-game-background" aria-live="polite"></section>
         <section id="rules-section" class="rules-section" aria-live="polite"></section>
 
-        <div class="score-box">
-            <div class="score">Score: <span id="score">0</span></div>
-        </div>
+        <div class="status-stack">
+            <div class="score-box">
+                <div class="score">Score: <span id="score">0</span></div>
+            </div>
 
-        <div class="score-panel">
-            <div class="timer">Time: <span id="time">30</span>s</div>
-            <button id="start-btn">Start Game</button>
-            <button id="pause-btn" hidden>Pause</button>
-        </div>
+            <section class="counter-box" aria-live="polite" aria-label="Water drop color counter">
+                <h2 class="counter-title">Drop Counter</h2>
+                <p id="water-drop-color-tracker" class="counter-status">No drops caught yet.</p>
+                <ul class="counter-list">
+                    <li>Blue Clean Drops: <span id="blue-clean-count">0</span></li>
+                    <li>Green Polluted Drops: <span id="green-polluted-count">0</span></li>
+                    <li>Brown Toxic Drops: <span id="brown-toxic-count">0</span></li>
+                </ul>
+                <p id="water-drop-type-tracker" class="counter-type" aria-live="polite"></p>
+            </section>
 
-        <section class="counter-box" aria-live="polite" aria-label="Water drop color counter">
-            <h2 class="counter-title">Drop Counter</h2>
-            <p id="water-drop-color-tracker" class="counter-status">No drops caught yet.</p>
-            <ul class="counter-list">
-                <li>Blue Clean Drops: <span id="blue-clean-count">0</span></li>
-                <li>Green Polluted Drops: <span id="green-polluted-count">0</span></li>
-                <li>Brown Toxic Drops: <span id="brown-toxic-count">0</span></li>
-            </ul>
-            <p id="water-drop-type-tracker" class="counter-type" aria-live="polite"></p>
-        </section>
+            <div class="score-panel">
+                <div class="timer">Time: <span id="time">30</span>s</div>
+                <button id="start-btn">Start Game</button>
+                <button id="pause-btn" hidden>Pause</button>
+            </div>
+        </div>
         
         <div class="difficulty-bar" aria-label="Difficulty selector">
             <span class="difficulty-title">Difficulty</span>

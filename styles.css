@@ -87,6 +87,13 @@ body {
     gap: 20px;
 }
 
+.status-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 800px;
+}
+
 .score-panel {
     display: flex;
     justify-content: flex-start;
