@@ -186,6 +186,15 @@ body {
         0 0 / 58px 22px repeat-x;
 }
 
+.brown-terrain-under-grass {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 62px;
+    background: linear-gradient(180deg, #3D2B1F 0%, #4B3621 100%);
+    z-index: 2;
+}
 
 #start-btn {
     padding: 8px 16px;
