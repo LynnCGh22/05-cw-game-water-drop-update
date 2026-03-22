@@ -347,6 +347,26 @@ function triggerConfetti() {
   setTimeout(() => confettiLayer.remove(), 3200);
 }
 
+function displayMessage(text, duration) {
+  const messageElement = document.createElement("div");
+  messageElement.textContent = text;
+  messageElement.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 1000;
+  `;
+  document.body.appendChild(messageElement);
+  setTimeout(() => messageElement.remove(), duration);
+}
+
 function startTimer() {
   timerInterval = setInterval(() => {
     timeLeft--;
