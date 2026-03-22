@@ -767,6 +767,19 @@ textarea {
     transform: translateX(2px) rotate(58deg);
 }
 
+.figure-leg::after {
+    content: "";
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    transform: translateY(-50%);
+    background: #7b4c24;
+    border: 2px solid #131313;
+    border-radius: 50%;
+}
+
 .bad-drop {
     background-color: #ff4444;
 }
