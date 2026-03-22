@@ -319,6 +319,15 @@ textarea {
     font-weight: bold;
 }
 
+.font-debug {
+    margin: 4px 0 0;
+    width: 800px;
+    color: #1d4f73;
+    font-size: 12px;
+    line-height: 1.3;
+    opacity: 0.8;
+}
+
 #start-btn {
     margin-left: auto;
 }
@@ -738,7 +747,7 @@ textarea {
 }
 
 @media (max-width: 850px) {
-    .game-wrapper, .score-panel, #game-container, .movement-nav, .rules-section, .const-game-background, .difficulty-bar, .counter-box {
+    .game-wrapper, .score-panel, #game-container, .movement-nav, .rules-section, .const-game-background, .difficulty-bar, .counter-box, .font-debug {
         width: 95vw;
     }
 

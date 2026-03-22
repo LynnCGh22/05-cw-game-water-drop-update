@@ -237,6 +237,57 @@ function getDropStartX(size) {
   return Math.max(0, Math.min(left, gameContainer.offsetWidth - size));
 }
 
+function parseFontCandidates(fontFamilyValue) {
+  if (!fontFamilyValue) return [];
+
+  return fontFamilyValue
+    .split(",")
+    .map((name) => name.trim().replace(/^['\"]|['\"]$/g, ""))
+    .filter(Boolean);
+}
+
+function detectLikelyRenderedFont(fontFamilyValue) {
+  const candidates = parseFontCandidates(fontFamilyValue);
+  const genericFamilies = new Set([
+    "serif",
+    "sans-serif",
+    "monospace",
+    "cursive",
+    "fantasy",
+    "system-ui",
+  ]);
+
+  for (const family of candidates) {
+    if (genericFamilies.has(family.toLowerCase())) {
+      continue;
+    }
+
+    if (document.fonts && document.fonts.check(`16px \"${family}\"`)) {
+      return family;
+    }
+  }
+
+  return candidates[candidates.length - 1] || "unknown";
+}
+
+function reportRenderedFont() {
+  const timerLabel = document.querySelector(".timer");
+  const scoreLabel = document.querySelector(".score");
+  const debugElement = document.getElementById("font-debug");
+  const target = timerLabel || scoreLabel;
+  if (!target) return;
+
+  const computedFontStack = window.getComputedStyle(target).fontFamily;
+  const likelyRenderedFont = detectLikelyRenderedFont(computedFontStack);
+  const message = `Rendered UI font (Score/Time): ${likelyRenderedFont} | Stack: ${computedFontStack}`;
+
+  if (debugElement) {
+    debugElement.textContent = message;
+  }
+
+  console.info(message);
+}
+
 // Wait for button click to start the game
 document.getElementById("start-btn").addEventListener("click", startGame);
 document.getElementById("pause-btn").addEventListener("click", pauseGame);
@@ -250,6 +301,11 @@ catcherNav.addEventListener("input", (event) => {
 updateCatcherPosition(catcherNav.value);
 RulesSection();
 renderGameBackground();
+reportRenderedFont();
+
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(reportRenderedFont);
+}
 
 function showPauseOverlay() {
   document.getElementById("pause-overlay").hidden = false;
@@ -295,6 +351,9 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timeLeft--;
     timeElement.textContent = timeLeft;
+    if(timeLeft === 10) {
+      print("10 seconds remaining!");
+    }
     if (timeLeft <= 0) {
       endGame();
     }
