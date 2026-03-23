@@ -40,6 +40,8 @@ const DEFAULT_MASTER_VOLUME = 0.7;
 const BACKGROUND_MUSIC_VOLUME = 0.55;
 const WINNER_SOUND_VOLUME = 0.9;
 const WIND_AMBIENCE_VOLUME = 0.35;
+const AUDIO_START_TIMEOUT_MS = 350;
+const STRICT_SYNC_TIMEOUT_MS = 900;
 const WIND_AMBIENCE_LEVELS = new Set(["Hard", "Expert"]);
 const SPLASH_VOICES_PER_SOUND = 3;
 const SPLASH_SOUND_PATHS = [
@@ -65,6 +67,7 @@ const scoreElement = document.getElementById("score");
 const timeElement = document.getElementById("time");
 const volumeSlider = document.getElementById("audio-volume");
 const muteButton = document.getElementById("mute-btn");
+const strictSyncToggle = document.getElementById("strict-sync-toggle");
 const audioReadyElement = document.getElementById("audio-ready");
 const rulesSectionElement = document.getElementById("rules-section");
 const gameBackgroundSectionElement = document.getElementById("game-background-section");
@@ -83,6 +86,7 @@ const splashSoundPool = SPLASH_SOUND_PATHS.flatMap((path) =>
 let splashSoundIndex = 0;
 let masterVolume = DEFAULT_MASTER_VOLUME;
 let isAudioMuted = false;
+let strictSyncMode = false;
 let rulesExpanded = true;
 let currentDifficulty = DEFAULT_DIFFICULTY;
 const CONFETTI_COLORS = [
@@ -168,6 +172,17 @@ function toggleMute() {
   applyAudioSettings();
 }
 
+function setStrictSyncMode(enabled) {
+  strictSyncMode = Boolean(enabled);
+  if (strictSyncToggle) {
+    strictSyncToggle.checked = strictSyncMode;
+  }
+}
+
+function getAudioStartTimeout() {
+  return strictSyncMode ? STRICT_SYNC_TIMEOUT_MS : AUDIO_START_TIMEOUT_MS;
+}
+
 function playManagedAudio(audioElement, restart = false) {
   if (!audioElement) return;
 
@@ -176,9 +191,35 @@ function playManagedAudio(audioElement, restart = false) {
   }
 
   const playPromise = audioElement.play();
-  if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch(() => {});
+  if (playPromise && typeof playPromise.then === "function") {
+    return playPromise.catch(() => {});
   }
+
+  return Promise.resolve();
+}
+
+function waitForAudioTick(audioElement) {
+  if (!audioElement) return Promise.resolve();
+
+  if (!audioElement.paused && audioElement.currentTime > 0) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    let done = false;
+
+    const finish = () => {
+      if (done) return;
+      done = true;
+      audioElement.removeEventListener("playing", finish);
+      audioElement.removeEventListener("timeupdate", finish);
+      resolve();
+    };
+
+    audioElement.addEventListener("playing", finish, { once: true });
+    audioElement.addEventListener("timeupdate", finish, { once: true });
+    setTimeout(finish, getAudioStartTimeout());
+  });
 }
 
 function setAudioReadyStatus(ready, remaining = 0) {
@@ -364,6 +405,9 @@ function syncWindAmbience() {
   if (!windSound) return;
 
   if (shouldPlayWindAmbience()) {
+    if (backgroundMusic && Number.isFinite(windSound.duration) && windSound.duration > 0) {
+      windSound.currentTime = backgroundMusic.currentTime % windSound.duration;
+    }
     playManagedAudio(windSound);
     return;
   }
@@ -492,6 +536,11 @@ if (volumeSlider) {
 if (muteButton) {
   muteButton.addEventListener("click", toggleMute);
 }
+if (strictSyncToggle) {
+  strictSyncToggle.addEventListener("change", (event) => {
+    setStrictSyncMode(event.target.checked);
+  });
+}
 
 [backgroundMusic, windSound, winnerSound].forEach((audioElement) => {
   if (!audioElement) return;
@@ -501,6 +550,7 @@ if (muteButton) {
 updateCatcherPosition(catcherNav.value);
 RulesSection();
 renderGameBackground();
+setStrictSyncMode(false);
 applyAudioSettings();
 setAudioReadyStatus(false);
 if (typeof requestIdleCallback === "function") {
@@ -674,10 +724,11 @@ function pauseGame() {
   showPauseOverlay();
 }
 
-function resumeGame() {
+async function resumeGame() {
   gamePaused = false;
   gameRunning = true;
-  playManagedAudio(backgroundMusic);
+  await playManagedAudio(backgroundMusic);
+  await waitForAudioTick(backgroundMusic);
   syncWindAmbience();
   document
     .querySelectorAll(".clean-water-drop, .dirty-water-drop-green, .dirty-water-drop-brown")
@@ -687,7 +738,7 @@ function resumeGame() {
   hidePauseOverlay();
 }
 
-function restartGame() {
+async function restartGame() {
   clearInterval(dropMaker);
   clearInterval(timerInterval);
   gamePaused = false;
@@ -706,7 +757,8 @@ function restartGame() {
   timeLeft = GAME_DURATION;
   timeElement.textContent = GAME_DURATION;
   gameRunning = true;
-  playManagedAudio(backgroundMusic);
+  await playManagedAudio(backgroundMusic);
+  await waitForAudioTick(backgroundMusic);
   syncWindAmbience();
   startTimer();
   dropMaker = setInterval(createDrop, 1000);
@@ -734,7 +786,7 @@ function endGameAndReset() {
   timeElement.textContent = GAME_DURATION;
 }
 
-function startGame() {
+async function startGame() {
   // Prevent multiple games from running at once
   if (gameRunning || gamePaused) return;
 
@@ -748,7 +800,8 @@ function startGame() {
   timeElement.textContent = timeLeft;
   document.getElementById("pause-btn").hidden = false;
 
-  playManagedAudio(backgroundMusic, true);
+  await playManagedAudio(backgroundMusic, true);
+  await waitForAudioTick(backgroundMusic);
   syncWindAmbience();
   startTimer();
 

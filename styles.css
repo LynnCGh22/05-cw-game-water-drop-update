@@ -365,6 +365,23 @@ textarea {
     background-color: #133a56;
 }
 
+.strict-sync-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #1d4f73;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    user-select: none;
+    cursor: pointer;
+}
+
+#strict-sync-toggle {
+    accent-color: #159A48;
+    cursor: pointer;
+}
+
 .audio-ready {
     font-size: 12px;
     font-weight: 700;
@@ -920,6 +937,10 @@ textarea {
     }
 
     .audio-ready {
+        font-size: 10px;
+    }
+
+    .strict-sync-control {
         font-size: 10px;
     }
 
