@@ -841,6 +841,14 @@ select:focus-visible,
     text-align: center;
 }
 
+.hero-mascot {
+    width: min(220px, 42vw);
+    height: auto;
+    display: block;
+    margin: 0 auto 8px;
+    pointer-events: none;
+}
+
 .game-tagline {
     color: #666;
     font-size: 18px;
@@ -938,6 +946,10 @@ select:focus-visible,
 @media (max-width: 480px) {
     .game-title {
         font-size: 26px;
+    }
+
+    .hero-mascot {
+        width: min(180px, 55vw);
     }
 
     .game-tagline {
