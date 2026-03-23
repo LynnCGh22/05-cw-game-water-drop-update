@@ -64,11 +64,31 @@ body {
     align-items: center;
     min-height: 100vh;
     background: linear-gradient(135deg, #2E9DF7 0%, #4FCB53 100%);
+    position: relative;
+    isolation: isolate;
     scrollbar-color: #FFC907;
     font-family: var(--font-brand-sans);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 16px 0 max(16px, env(safe-area-inset-bottom));
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.42;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 560'%3E%3Cpath d='M210 28C333 177 366 252 366 347C366 463 290 532 210 532C130 532 54 463 54 347C54 252 87 177 210 28Z' fill='none' stroke='%23ffffff' stroke-opacity='0.16' stroke-width='13'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 150'%3E%3Cpath d='M60 8C93 49 108 72 108 98C108 126 87 142 60 142C33 142 12 126 12 98C12 72 27 49 60 8Z' fill='%23ffffff' fill-opacity='0.14'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 150'%3E%3Cpath d='M60 8C93 49 108 72 108 98C108 126 87 142 60 142C33 142 12 126 12 98C12 72 27 49 60 8Z' fill='%23ffffff' fill-opacity='0.14'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 150'%3E%3Cpath d='M60 8C93 49 108 72 108 98C108 126 87 142 60 142C33 142 12 126 12 98C12 72 27 49 60 8Z' fill='%23ffffff' fill-opacity='0.14'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 180'%3E%3Cpath d='M0 92C120 30 240 30 360 92C480 154 600 154 720 92C840 30 960 30 1080 92C1200 154 1320 154 1440 92' fill='none' stroke='%23ffffff' stroke-opacity='0.16' stroke-width='10'/%3E%3C/svg%3E");
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat-x;
+    background-size: min(62vw, 520px) auto, 88px auto, 92px auto, 84px auto, min(780px, 100vw) auto;
+    background-position: center 46%, 10% 40%, 87% 14%, 87% 82%, center 100%;
 }
 
 button,
@@ -126,6 +146,15 @@ textarea {
     gap: 20px;
     width: var(--panel-width);
     max-width: var(--layout-max-width);
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 720px) {
+    body::before {
+        background-size: min(74vw, 430px) auto, 70px auto, 70px auto, 68px auto, min(640px, 110vw) auto;
+        background-position: center 52%, 9% 36%, 87% 18%, 86% 81%, center 100%;
+    }
 }
 
 .status-stack {
